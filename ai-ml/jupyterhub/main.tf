@@ -105,7 +105,7 @@ module "eks" {
 
       #instance_types = ["m5.xlarge"]
       # setup might need nearly 8 GB memory
-      instance_types = ["m4.xlarge"]
+      instance_types = ["t3.xlarge"]
 
       ebs_optimized = true
       block_device_mappings = {

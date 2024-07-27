@@ -32,7 +32,7 @@ module "ebs_csi_driver_irsa" {
 
 module "eks_blueprints_addons" {
   source  = "aws-ia/eks-blueprints-addons/aws"
-  version = "~> 1.2"
+  version = "~> 1.16.0"
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
@@ -75,11 +75,11 @@ module "eks_blueprints_addons" {
   #---------------------------------------
   # Metrics Server
   #---------------------------------------
-  enable_metrics_server = false
-  #metrics_server = {
-  #  timeout = "300"
-  #  values  = [templatefile("${path.module}/helm/metrics-server/values.yaml", {})]
-  #}
+  enable_metrics_server = true
+  metrics_server = {
+    timeout = "300"
+    values  = [templatefile("${path.module}/helm/metrics-server/values.yaml", {})]
+  }
 
   #---------------------------------------
   # Cluster Autoscaler
@@ -100,6 +100,7 @@ module "eks_blueprints_addons" {
   enable_karpenter                  = true
   karpenter_enable_spot_termination = true
   karpenter = {
+    logLevel = "debug"
     timeout             = "300"
     repository_username = data.aws_ecrpublic_authorization_token.token.user_name
     repository_password = data.aws_ecrpublic_authorization_token.token.password
@@ -176,7 +177,7 @@ module "eks_blueprints_addons" {
           name: gpu-ts
           clusterName: ${module.eks.cluster_name}
           karpenterRole: ${split("/", module.eks_blueprints_addons.karpenter.node_iam_role_arn)[1]}
-          instanceSizes: ["xlarge", "2xlarge", "4xlarge", "8xlarge", "16xlarge", "24xlarge"]
+          instanceSizes: ["xlarge", "2xlarge", "4xlarge", "8xlarge"]
           instanceFamilies: ["g5"]
           taints:
             - key: hub.jupyter.org/dedicated
@@ -190,15 +191,15 @@ module "eks_blueprints_addons" {
     }
     karpenter-resources-mig = {
       name        = "karpenter-resources-gpu"
-      description = "A Helm chart for karpenter GPU based resources - compatible with P4d instances"
+      description = "A Helm chart for karpenter GPU based resources - compatible with p3 instances"
       chart       = "${path.module}/helm/karpenter-resources"
       values = [
         <<-EOT
           name: gpu
           clusterName: ${module.eks.cluster_name}
           karpenterRole: ${split("/", module.eks_blueprints_addons.karpenter.node_iam_role_arn)[1]}
-          instanceSizes: ["24xlarge"]
-          instanceFamilies: ["p4d"]
+          instanceSizes: ["2xlarge"]
+          instanceFamilies: ["p3"]
           taints:
             - key: hub.jupyter.org/dedicated
               value: "user"
@@ -267,7 +268,7 @@ module "eks_blueprints_addons" {
 #---------------------------------------------------------------
 module "eks_data_addons" {
   source  = "aws-ia/eks-data-addons/aws"
-  version = "~> 1.0" # ensure to update this to the latest/desired version
+  version = "~> 1.32.0" # ensure to update this to the latest/desired version
 
   oidc_provider_arn = module.eks.oidc_provider_arn
 

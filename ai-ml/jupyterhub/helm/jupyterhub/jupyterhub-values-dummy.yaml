@@ -130,6 +130,7 @@ singleuser:
         image: cschranz/gpu-jupyter:v1.5_cuda-11.6_ubuntu-20.04_python-only
         node_selector:
           NodePool: gpu-ts # TIME-SLICING: Use this config with time-slicing mode
+          hub.jupyter.org/node-purpose: user
         tolerations:
           - key: "nvidia.com/gpu"
             operator: "Exists"
@@ -141,19 +142,19 @@ singleuser:
         extra_resource_limits:
           nvidia.com/gpu: "1" # TIME-SLICING: Use a slice of GPU using time-slicing mode
         cpu_limit: 2
-        mem_limit: 4G
+        mem_limit: 1G
         cpu_guarantee: 2
-        mem_guarantee: 4G
+        mem_guarantee: 1G
         cmd: "start-singleuser.sh"
     # Karpenter doesn't support for requesting resources with MIG slices e.g., nvidia.com/mig-1g.5gb: 1,  or nvidia.com/mig-2g.20gb: 1 etc.
     # Hence, this profile relies on Managed node groups with GPU MIG enabled
-    - display_name: Data Science (GPU + MIG on P4d.24xlarge)
-      description: "GPU MIG with P4d instances | nvidia.com/mig-1g.5gb: 1 | Cluster Autoscaler"
+    - display_name: Data Science (GPU + MIG on p3.2xlarge)
+      description: "GPU MIG with P3 instances | nvidia.com/mig-1g.5gb: 1 | Cluster Autoscaler"
       kubespawner_override:
         image: cschranz/gpu-jupyter:v1.5_cuda-11.6_ubuntu-20.04_python-only
         node_selector:
           provisioner: cluster-autoscaler
-          node.kubernetes.io/instance-type: p4d.24xlarge
+          node.kubernetes.io/instance-type: p3.2xlarge
         tolerations:
           - key: "nvidia.com/gpu"
             operator: "Exists"
@@ -171,12 +172,12 @@ singleuser:
         cpu_limit: 2
         mem_limit: 10G
         cmd: "start-singleuser.sh"
-    - display_name: Data Science (GPU - P4d.24xlarge)
-      description: "GPU with P4d instances | Karpenter Autoscaler"
+    - display_name: Data Science (GPU - p3.2xlarge)
+      description: "GPU with P3 instances | Karpenter Autoscaler"
       kubespawner_override:
         image: cschranz/gpu-jupyter:v1.5_cuda-11.6_ubuntu-20.04_python-only
         node_selector:
-          node.kubernetes.io/instance-type: p4d.24xlarge
+          node.kubernetes.io/instance-type: p3.2xlarge
           NodePool: gpu
         tolerations:
           - key: "nvidia.com/gpu"

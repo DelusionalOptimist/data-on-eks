@@ -86,7 +86,7 @@ resource "aws_security_group" "efs" {
 #---------------------------------------
 module "efs_config" {
   source  = "aws-ia/eks-blueprints-addons/aws"
-  version = "~> 1.2"
+  version = "~> 1.16.0"
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
